@@ -3,6 +3,8 @@ package com.zivansabilli3153.resepkost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.zivansabilli3153.resepkost.data.RecipeDatabase
 import com.zivansabilli3153.resepkost.data.RecipeRepository
@@ -30,6 +32,8 @@ class MainActivity : ComponentActivity() {
                 SettingsDataStore(appContext)
             }
 
+            val themeColor by settingsDataStore.themeFlow.collectAsState(initial = "blue")
+
             val factory = remember {
                 ViewModelFactory(
                     repository = repository,
@@ -37,7 +41,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            ResepKostTheme {
+            ResepKostTheme(
+                themeColor = themeColor
+            ) {
                 SetupNavGraph(factory = factory)
             }
         }
