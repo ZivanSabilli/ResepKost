@@ -3,45 +3,43 @@ package com.zivansabilli3153.resepkost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.remember
+import com.zivansabilli3153.resepkost.data.RecipeDatabase
+import com.zivansabilli3153.resepkost.data.RecipeRepository
+import com.zivansabilli3153.resepkost.navigation.SetupNavGraph
 import com.zivansabilli3153.resepkost.ui.theme.ResepKostTheme
+import com.zivansabilli3153.resepkost.util.SettingsDataStore
+import com.zivansabilli3153.resepkost.util.ViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        val appContext = applicationContext
+
         setContent {
+            val database = remember {
+                RecipeDatabase.getDatabase(appContext)
+            }
+
+            val repository = remember {
+                RecipeRepository(database.recipeDao())
+            }
+
+            val settingsDataStore = remember {
+                SettingsDataStore(appContext)
+            }
+
+            val factory = remember {
+                ViewModelFactory(
+                    repository = repository,
+                    settingsDataStore = settingsDataStore
+                )
+            }
+
             ResepKostTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                SetupNavGraph(factory = factory)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ResepKostTheme {
-        Greeting("Android")
     }
 }
